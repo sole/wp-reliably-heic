@@ -4,20 +4,26 @@ if(!class_exists('ReliablyHEICPlugin')) {
 
 	class ReliablyHEICPlugin {
 		public function setup() {
-			// This is to add the 'Settings' link in the Plugins list
 			$index_path = dirname(plugin_basename(__FILE__)) . '/index.php';
 			add_filter('plugin_action_links_' . $index_path, array($this, 'add_plugin_settings_link' ));
 			
+			add_filter('upload_mimes', array($this, 'add_heic_upload_mime_type'));
+
 			add_action('admin_menu', array($this, 'setup_admin_menu'));
-		}
-
-		public function add_admin_settings() {
-
+			
 		}
 
 		public function add_plugin_settings_link($actions) {
+			// This is to add the 'Settings' link in the Plugins list
 			$link = array('<a href="' . admin_url( 'options-general.php?page=reliably_heic' ) . '">' . __( 'Settings', 'reliably_heic' ) . '</a>');
 			return array_merge($actions, $link);
+		}
+
+		public function add_heic_upload_mime_type($mime_types) {
+			if(!isset($mime_types['heic'])) {
+				$heic_type = array('heic' => 'image/heic');
+				return array_merge($mime_types, $heic_type);
+			}
 		}
 
 		public function setup_admin_menu() {

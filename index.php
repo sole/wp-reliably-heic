@@ -10,6 +10,8 @@
  * Text Domain:       reliably-heic
  */
 
+ defined( 'ABSPATH' ) || exit;
+
  require_once('ReliablyHEICPlugin.php');
 
  $plugin = new ReliablyHEICPlugin();

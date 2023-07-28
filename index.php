@@ -9,3 +9,8 @@
  * Author URI:        https://soledadpenades.com/
  * Text Domain:       reliably-heic
  */
+
+ require_once('ReliablyHEICPlugin.php');
+
+ $plugin = new ReliablyHEICPlugin();
+ $plugin->setup();

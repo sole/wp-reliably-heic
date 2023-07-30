@@ -49,33 +49,34 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				return $file;
 			}
 			
+			error_log('original file data '. print_r($file, true));
 			$input_path = $file['tmp_name'];
-			$tmp_path = $input_path . '_tmp';
-			$output_filename = basename($input_path) . '.jpg';
-			$output_path = dirname($input_path) . '/' . $output_filename;
+			$output_path = $input_path . '.jpg';
 			error_log('input_path '. $input_path);
-			error_log('tmp_path '. $tmp_path);
-			error_log('output_filename '. $output_filename);
 			error_log('output_path '. $output_path);
-			
 
 			try {
 				// TODO is there a way to carry over the EXIF metadata (exif) to the copy?
-				$this->save_image_for_browser($input_path, $tmp_path);
-				
+				$t0 = time();
+				$this->save_image_for_browser($input_path, $output_path);
+				$time_diff = time() - $t0;
+				error_log('took ' . $time_diff);
+				error_log('filesize of output image '. wp_filesize($output_path));
 				// TODO resizing if configured etc
 				// Not sure if there's a better way? if I set tmp_name on the file, will the server delete temp uploads?
-				rename($tmp_path, $input_path);
+				rename($output_path, $input_path);
 
 				// Make the upload make sense
-				$file['name'] = $output_filename;
-				$file['size'] = wp_filesize($output_path);
-				error_log('new image size ' . $file['size']);
+				$file['name'] = basename($file['name']) . '.jpg';
+				$file['size'] = wp_filesize($input_path);
 				$file['type'] = 'image/jpeg';
 
 				return $file;
 
+			} catch(Exception $e) {
+				error_log('and this???' . $e->getMessage());
 			} catch(ImagickException $e) {
+				error_log('save for browser');
 				error_log($e->getMessage());
 			}
 			
@@ -182,13 +183,14 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				$result['error'] = 'Irrelevant error if you already got an ImageMagick error';
 			} else {
 				$im = new Imagick();
+				$v = Imagick::getVersion();
 				$test_image = 'test.heic';
 				$test_image_path = dirname(__FILE__) . '/' . $test_image;
 				error_log('test image path ' . $test_image_path);
 				try {
 					$im->readImage($test_image_path);
 				} catch(ImagickException $ie) {
-					$result['error'] = 'ImageMagick is present but HEIC images cannot be opened: ' . $ie->getMessage();
+					$result['error'] = 'ImageMagick is present (version <tt>'. $v['versionString'] .'</tt>) but HEIC images cannot be opened: <tt>' . $ie->getMessage() . '</tt>';
 				}
 			}
 			return $result;
@@ -200,8 +202,16 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				throw new Exception('The image at ' . $input_path . ' could not be read with ImageMagick');
 			}
 
-			$im->setImageFormat('jpg');
-			$im->writeImage($output_path);
+			$geom = $im->getImageGeometry();
+			error_log('geometry ' . print_r($geom, true));
+
+			
+			$res_format = $im->setImageFormat('jpg');
+			error_log('set format to jpg: ' . $res_format);
+			
+			$ok = $im->writeImage($output_path);
+			error_log('and save image to ' . $output_path . ' = '. $ok);
+			
 		}
 
 	}

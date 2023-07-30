@@ -8,8 +8,14 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			add_filter('plugin_action_links_' . $index_path, array($this, 'add_plugin_settings_link' ));
 			
 			add_filter('upload_mimes', array($this, 'add_heic_upload_mime_type'));
-			// TODO: this isn't doing what it should, look in here for more info or tips... https://developer.wordpress.org/reference/functions/media_upload_form/
-			add_filter('plupload_default_settings', array($this, 'allow_heic_upload'), 1);
+			
+			// We shouldn't need this, but apparently we do, because the outcome of the
+			// add_filter underneath is invalidated when some other function undoes
+			// our work later.
+			// So keeping both for good measure!
+			remove_filter('plupload_default_settings', 'wp_show_heic_upload_error');
+			add_filter('plupload_default_settings', array($this, 'allow_heic_upload'), 10);
+			
 			add_filter('wp_handle_upload_prefilter', array($this, 'handle_heic_upload'));
 			
 			add_action('admin_menu', array($this, 'setup_admin_menu'));
@@ -32,11 +38,12 @@ if(!class_exists('ReliablyHEICPlugin')) {
 
 		public function allow_heic_upload($settings) {
 			// Arguably disables the 'This image cannot be displayed in a web browser. For best results, convert it to JPEG before uploading.' message
-			error_log('does this run');
+			error_log('does this run?');
 			error_log(print_r($settings, 1));
 			$settings['heic_upload_error'] = false;
 			return $settings;
 		}
+
 
 		public function handle_heic_upload($file) {
 			$not_an_heic_image = false;
@@ -184,7 +191,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				$v = Imagick::getVersion();
 				$test_image = 'test.heic';
 				$test_image_path = dirname(__FILE__) . '/' . $test_image;
-				error_log('test image path ' . $test_image_path);
+		
 				try {
 					$im->readImage($test_image_path);
 				} catch(ImagickException $ie) {

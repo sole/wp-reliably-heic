@@ -49,33 +49,31 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				return $file;
 			}
 			
-			error_log('original file data '. print_r($file, true));
 			$input_path = $file['tmp_name'];
 			$output_path = $input_path . '.jpg';
-			error_log('input_path '. $input_path);
-			error_log('output_path '. $output_path);
-
+			
 			try {
-				// TODO is there a way to carry over the EXIF metadata (exif) to the copy?
-				$t0 = time();
-				$this->save_image_for_browser($input_path, $output_path);
-				$time_diff = time() - $t0;
-				error_log('took ' . $time_diff);
-				error_log('filesize of output image '. wp_filesize($output_path));
 				// TODO resizing if configured etc
-				// Not sure if there's a better way? if I set tmp_name on the file, will the server delete temp uploads?
+				$this->save_image_for_browser($input_path, $output_path);
+				
+				// Swaaap!
 				rename($output_path, $input_path);
 
 				// Make the upload make sense
-				$file['name'] = basename($file['name']) . '.jpg';
+				$info = pathinfo($file['name']);
+				$filename = $info['filename'];
+				
+				// Fallback if wEirD thIngS hApPeneD
+				if(strlen($filename) == 0) {
+					$filename = basename($input_path);
+				}
+				$file['name'] = $filename . '.jpg';
 				$file['size'] = wp_filesize($input_path);
 				$file['type'] = 'image/jpeg';
 
 				return $file;
 
-			} catch(Exception $e) {
-				error_log('and this???' . $e->getMessage());
-			} catch(ImagickException $e) {
+			} catch(Exception | ImagickException $e) {
 				error_log('save for browser');
 				error_log($e->getMessage());
 			}
@@ -202,10 +200,6 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				throw new Exception('The image at ' . $input_path . ' could not be read with ImageMagick');
 			}
 
-			$geom = $im->getImageGeometry();
-			error_log('geometry ' . print_r($geom, true));
-
-			
 			$res_format = $im->setImageFormat('jpg');
 			error_log('set format to jpg: ' . $res_format);
 			

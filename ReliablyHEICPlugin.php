@@ -38,8 +38,6 @@ if(!class_exists('ReliablyHEICPlugin')) {
 
 		public function allow_heic_upload($settings) {
 			// Arguably disables the 'This image cannot be displayed in a web browser. For best results, convert it to JPEG before uploading.' message
-			error_log('does this run?');
-			error_log(print_r($settings, 1));
 			$settings['heic_upload_error'] = false;
 			return $settings;
 		}

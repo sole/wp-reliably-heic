@@ -20,6 +20,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			
 			add_action('admin_menu', array($this, 'setup_admin_menu'));
 			
+			add_action('admin_enqueue_scripts', array($this, 'add_js_to_media_upload'));
 		}
 
 		public function add_plugin_settings_link($actions) {
@@ -96,6 +97,15 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				'reliably_heic',
 				array($this, 'render_settings_page')
 			);
+		}
+
+		public function add_js_to_media_upload($hook) {
+			error_log('the hook is '. $hook);
+			if('media-new.php' !== $hook) { //TODO and upload.php?
+				return;
+			}
+			// can this be added AFTER the uploader is set up?
+			wp_enqueue_script('intercept_drops', plugin_dir_url(__FILE__) . 'intercept_drops.js');
 		}
 
 		public function render_settings_page() {

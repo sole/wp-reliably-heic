@@ -30,17 +30,46 @@
 			let f = files[file];
 			if(f.type === 'image/heic') {
 				console.log(f);
+
+				let native = f.getNative(); // This is the actual File instance in the browser
+				
+				let fr = new FileReader();
+				fr.addEventListener('load', (e) => {
+					let buffer = e.target.result;
+					let h2j = new HEIF2JPG(libheif);
+					let jpg = h2j.convert(buffer);
+
+					if(jpg.length === 0) {
+						console.error('h2j could not decode anything');
+					} else {
+						console.info('decoded', jpg.length);
+					}
+
+					setTimeout(() => {
+						let img = jpg[0];
+						let w = img.get_width();
+						let h = img.get_height();
+						console.log('Decoded: ', w, h);
+						HEIFImageToJPEGBlob(img, (blob) => {
+							console.log('please let the end be soon');
+							let jpgFile = new File([blob], 'from-heic.jpg');
+							uploader.addFile(jpgFile);
+						});
+					}, 1);
+				});
+				fr.readAsArrayBuffer(native);
+
+
 				uploader.removeFile(files[file]);
 				
-				// TODO: figure a way of using the original image data from the file
 
 				// Con async hemos topado
-				getImage((blob) => {
+				/*getImage((blob) => {
 					let jpegFile = new File([blob], 'something.jpg');
 					// Calling uploader.addFile() will trigger files added again
 					// but it's OK because we skip non HEIC
 					uploader.addFile(jpegFile);
-				});
+				});*/
 				return false;
 			} else {
 				console.log('Not an heic, benevolently ignoring ', f.type);
@@ -50,14 +79,23 @@
 		//return true;
 	}
 
-	function getImage(cb) {
+	function HEIFImageToJPEGBlob(image, cb) {
+		console.log('HEIFImageToJPEGBlob');
 		let canvas = document.createElement('canvas');
-		canvas.width = 100;
-		canvas.height = 100;
+		canvas.width = image.get_width();
+		canvas.height = image.get_height();
 		ctx = canvas.getContext('2d');
-		ctx.fillStyle = '#f0f';
-		ctx.fillRect(0, 0, 100, 100);
-		let type = 'image/jpeg';
-		canvas.toBlob(cb, { type });
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		let imageData = ctx.createImageData(canvas.width, canvas.height);
+		// This method should be called decodeAgain!
+		image.display(imageData, (decodedImageData) => {
+			console.log("arguably finished???");
+			ctx.putImageData(decodedImageData, 0, 0);
+			canvas.toBlob(cb, { type: 'image/jpeg' }, 0.1);
+		});
+
+		//let type = 'image/jpeg';
+		//canvas.toBlob(cb, { type });
 	}
 })();

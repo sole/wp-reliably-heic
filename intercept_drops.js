@@ -53,23 +53,16 @@
 						HEIFImageToJPEGBlob(img, (blob) => {
 							console.log('please let the end be soon');
 							let jpgFile = new File([blob], 'from-heic.jpg');
+							// Calling uploader.addFile() will trigger files added again
+							// but it's OK because we skip non HEIC
 							uploader.addFile(jpgFile);
 						});
 					}, 1);
 				});
 				fr.readAsArrayBuffer(native);
 
-
 				uploader.removeFile(files[file]);
-				
-
-				// Con async hemos topado
-				/*getImage((blob) => {
-					let jpegFile = new File([blob], 'something.jpg');
-					// Calling uploader.addFile() will trigger files added again
-					// but it's OK because we skip non HEIC
-					uploader.addFile(jpegFile);
-				});*/
+			
 				return false;
 			} else {
 				console.log('Not an heic, benevolently ignoring ', f.type);
@@ -94,8 +87,5 @@
 			ctx.putImageData(decodedImageData, 0, 0);
 			canvas.toBlob(cb, { type: 'image/jpeg' }, 0.1);
 		});
-
-		//let type = 'image/jpeg';
-		//canvas.toBlob(cb, { type });
 	}
 })();

@@ -108,7 +108,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 		*/
 		public function add_js_to_media_new($hook) {
 			
-			if('media-new.php' !== $hook) {
+			if(!in_array($hook, ['media-new.php' /*, 'upload.php'*/])) {
 				return;
 			}
 			

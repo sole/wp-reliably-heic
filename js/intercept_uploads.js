@@ -1,20 +1,30 @@
 // periodically polls (urgh) until an 'uploader' object shows up in the global scope
 (() => {
 	let sneaky = setInterval(findUploader, 500);
+	let tries = 0;
 
 	function findUploader() {
 		let uploader = window.uploader;
 		if(uploader !== undefined) {
-			console.log('found it!');
 			clearInterval(sneaky);
 			attachToUploader(uploader);
 		} else {
-			console.log('still nothing')	
+			console.log('Waiting for uploader, attempt = ' + tries);
+			tries++;
+			if(tries > 10) {
+				console.log('Giving up on attaching to the uploader. Maybe reload the page and hope for the best?');
+				clearInterval(sneaky);
+			}
 		}
 	}
 
 	function attachToUploader(up) {
 		up.bind('FilesAdded', onFilesAdded, up, 100);
+		// If we show this, then users don't need to look at the console output
+		let h1 = document.querySelector('#wpbody .wrap h1');
+		if(h1) {
+			h1.innerHTML += ' <sup style="background: #ffe; padding: 3px; position: relative; top: -0.5em; font-size: 60%; font-style: italic;">with <b>EXPERIMENTAL</b> HEIC to JPEG support</sup>';
+		}
 	}
 
 	function onFilesAdded(uploader, files) {

@@ -129,7 +129,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			<div class="wrap">
 			<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 			<?php // echo print_r(wp_plupload_default_settings(), 1); ?>
-			<h2>Requirements check</h2>
+			<h2>Troubleshooting</h2>
 			<?php if($satisfied) { ?>
 				All in place: the plugin can work correctly!
 			<?php } else {

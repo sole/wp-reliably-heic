@@ -105,9 +105,9 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				return;
 			}
 			// can this be added AFTER the uploader is set up?
-			wp_enqueue_script('reliablyheic1', plugin_dir_url(__FILE__) . 'libheif.js');
-			wp_enqueue_script('reliablyheic2', plugin_dir_url(__FILE__) . 'HEIF2JPG.js');
-			wp_enqueue_script('reliablyheic3', plugin_dir_url(__FILE__) . 'intercept_uploads.js');
+			wp_enqueue_script('reliablyheic1', plugin_dir_url(__FILE__) . 'js/libs/libheif.js');
+			wp_enqueue_script('reliablyheic2', plugin_dir_url(__FILE__) . 'js/HEIF2JPG.js');
+			wp_enqueue_script('reliablyheic3', plugin_dir_url(__FILE__) . 'js/intercept_uploads.js');
 		}
 
 		public function render_settings_page() {

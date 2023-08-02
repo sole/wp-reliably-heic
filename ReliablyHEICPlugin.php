@@ -20,7 +20,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			
 			add_action('admin_menu', array($this, 'setup_admin_menu'));
 			
-			add_action('admin_enqueue_scripts', array($this, 'add_js_to_media_upload'));
+			add_action('admin_enqueue_scripts', array($this, 'add_js_to_media_new'));
 		}
 
 		public function add_plugin_settings_link($actions) {
@@ -99,12 +99,19 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			);
 		}
 
-		public function add_js_to_media_upload($hook) {
-			error_log('the hook is '. $hook);
-			if('media-new.php' !== $hook) { //TODO and upload.php?
+		/**
+		Note:
+		The interceptable uploader seems to only be set up in media-new.php ('Add new')
+		So even if you CAN upload files with drag and drop in upload.php (the page which the top 'Media' links to),
+		I have not figured out how to intercept that uploader yet, thus HEIC conversion client side won't happen there.
+		Go to 'Add new' to get it working.
+		*/
+		public function add_js_to_media_new($hook) {
+			
+			if('media-new.php' !== $hook) {
 				return;
 			}
-			// can this be added AFTER the uploader is set up?
+			
 			wp_enqueue_script('reliablyheic1', plugin_dir_url(__FILE__) . 'js/libs/libheif.js');
 			wp_enqueue_script('reliablyheic2', plugin_dir_url(__FILE__) . 'js/HEIF2JPG.js');
 			wp_enqueue_script('reliablyheic3', plugin_dir_url(__FILE__) . 'js/intercept_uploads.js');

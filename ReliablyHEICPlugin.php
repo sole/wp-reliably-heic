@@ -17,8 +17,13 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			add_filter('plupload_default_settings', array($this, 'allow_heic_upload'), 10);
 			
 			add_filter('wp_handle_upload_prefilter', array($this, 'handle_heic_upload'));
-			
+
+			$this->settings_page_name = 'reliably-heic-page';
+			$this->setting_experimental_id = 'reliably-heic-experimental-front-end';
+			$this->setting_experimental_description = 'Enable front-end HEIC to JPEG image conversion';
+
 			add_action('admin_menu', array($this, 'setup_admin_menu'));
+
 			
 			add_action('admin_enqueue_scripts', array($this, 'add_js_to_media_new'));
 		}
@@ -88,14 +93,70 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			return $file;
 		}
 
+
 		public function setup_admin_menu() {
 			add_submenu_page(
 				'options-general.php',
-				'Reliably HEIC Options',
-				'Reliably HEIC',
+				'Reliably HEIC', // Page title
+				'Reliably HEIC', // Menu title
 				'manage_options',
 				'reliably_heic',
 				array($this, 'render_settings_page')
+			);
+
+			$this->setup_settings();
+		}
+
+		public function setup_settings() {
+
+			$s = 'reliably-heic';
+			$section_id = $s . '-id';
+
+			add_settings_section(
+				$section_id,
+				'Configuration',
+				function() {
+					//echo 'before the list of settings';
+				},
+				$this->settings_page_name
+			);
+
+			
+			register_setting(
+				'media',
+				$this->setting_experimental_id, //'reliably-heic-experimental-front-end', 
+				array(
+					'type'              => 'boolean',
+					'description'       => $this->setting_experimental_description, //'Perform HEIC image conversions in the browser (EXPERIMENTAL)',
+					'sanitize_callback' => 'rest_sanitize_boolean',
+					'show_in_rest'      => true
+				)
+			);
+
+			add_settings_field(
+				'enable', //  field id
+				$this->setting_experimental_description, //'Enable front-end HEIC to JPEG image conversion', // field title
+				array($this, 'enable_setting_callback'),
+				$this->settings_page_name,
+				$section_id
+			);
+
+			
+		}
+
+		function enable_setting_callback() {
+			$id = $this->setting_experimental_id;
+
+			$value = get_option($id /*'reliably-heic-experimental-front-end'*/);
+error_log('value is '. print_r($value, 1));
+			printf(
+				'<input type="checkbox" id="%s" name="%s" %s/> <label for="%s">%s</label><p class="description">%s</p>',
+				$id,
+				$id,
+				checked($value, '1', false),
+				$id,
+				'When ticked, intercepts HEIC file uploads from the media/Add new section, and tries to convert them to JPG in the browser',
+				'This is highly experimental, but if it works then you do not depend on your hosting company to update or install a recent version of ImageMagick.'
 			);
 		}
 
@@ -128,6 +189,16 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			?>
 			<div class="wrap">
 			<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+			
+			<form method="post" action="options-general.php?page=reliably_heic" novalidate="novalidate">
+			<?php
+				
+				do_settings_sections($this->settings_page_name);
+				
+			?>
+			<?php submit_button(); ?>
+			</form>
+
 			<?php // echo print_r(wp_plupload_default_settings(), 1); ?>
 			<h2>Troubleshooting</h2>
 			<?php if($satisfied) { ?>
@@ -149,6 +220,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			?>
 			
 			<?php
+			
 		}
 
 		protected function run_through_system_requirements() {

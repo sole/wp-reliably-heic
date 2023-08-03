@@ -31,6 +31,7 @@
 		console.log("files added", uploader);
 		console.info(files);
 		// uploader.files seems to have the files that have been added
+		
 		_.each(files, function(up, file) {
 			// TODO why am I using this each thing? this should work in modern browsers...
 			// I should probably get rid of this
@@ -42,7 +43,7 @@
 				console.log(f);
 
 				let native = f.getNative(); // This is the actual File instance in the browser
-				
+
 				let fr = new FileReader();
 				fr.addEventListener('load', (e) => {
 					let buffer = e.target.result;
@@ -55,19 +56,18 @@
 						console.info('decoded', jpg.length);
 					}
 
-					setTimeout(() => {
-						let img = jpg[0];
-						let w = img.get_width();
-						let h = img.get_height();
-						console.log('Decoded: ', w, h);
-						HEIFImageToJPEGBlob(img, (blob) => {
-							console.log('please let the end be soon');
-							let jpgFile = new File([blob], 'from-heic.jpg');
-							// Calling uploader.addFile() will trigger files added again
-							// but it's OK because we skip non HEIC
-							uploader.addFile(jpgFile);
-						});
-					}, 1);
+					let img = jpg[0];
+					let w = img.get_width();
+					let h = img.get_height();
+					console.log('Decoded: ', w, h);
+					HEIFImageToJPEGBlob(img, (blob) => {
+						console.log('please let the end be soon');
+						let jpgFile = new File([blob], 'from-heic.jpg');
+						// Calling uploader.addFile() will trigger files added again
+						// but it's OK because we skip non HEIC
+						uploader.addFile(jpgFile);
+					});
+					
 				});
 				fr.readAsArrayBuffer(native);
 

@@ -185,7 +185,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			}
 			
 			wp_enqueue_script('reliablyheic1', plugin_dir_url(__FILE__) . 'js/libs/libheif.js');
-			wp_enqueue_script('reliablyheic2', plugin_dir_url(__FILE__) . 'js/HEIF2JPG.js');
+			wp_enqueue_script('reliablyheic2', plugin_dir_url(__FILE__) . 'js/HEIC2JPG.js');
 			wp_enqueue_script('reliablyheic3', plugin_dir_url(__FILE__) . 'js/intercept_uploads.js');
 		}
 

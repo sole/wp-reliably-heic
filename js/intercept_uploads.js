@@ -40,7 +40,7 @@
 		}).forEach(async (file) => {
 			let nativeFile = file.getNative(); // This is the actual File instance in the browser
 			let arrayBuffer = await nativeFile.arrayBuffer();
-			let jpgBlob = await HEIF2JPG.getJPGBlob(arrayBuffer);
+			let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer);
 			let jpgFile = new File([jpgBlob], 'from heic!!.jpg');
 			
 			// Calling uploader.addFile() will trigger the FilesAdded again,

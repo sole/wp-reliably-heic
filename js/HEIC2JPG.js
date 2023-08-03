@@ -1,14 +1,14 @@
-class HEIF2JPG {
+class HEIC2JPG {
 
 	static async getJPGBlob(arrayBuffer, options = []) {
 		let libheif = options.libheif ? options.libheif : window.libheif;
-		let decodedImages = HEIF2JPG.convert(arrayBuffer, libheif);
+		let decodedImages = HEIC2JPG.convert(arrayBuffer, libheif);
 		if(decodedImages.length === 0) {
 			throw new Exception('HEIF2JPG: the buffer cannot be decoded as an image');
 		}
 		let firstImage = decodedImages[0];
-		let canvas = await HEIF2JPG.getCanvasFromImage(firstImage);
-		let blob = await HEIF2JPG.getCanvasAsJPGBlob(canvas);
+		let canvas = await HEIC2JPG.getCanvasFromImage(firstImage);
+		let blob = await HEIC2JPG.getCanvasAsJPGBlob(canvas);
 		return blob;
 	}
 

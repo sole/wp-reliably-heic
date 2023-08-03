@@ -30,8 +30,10 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			}
 		}
 
+		/**
+		 * This is to add the 'Settings' link in the Plugins list (wp-admin/plugins.php)
+		 */
 		public function add_plugin_settings_link($actions) {
-			// This is to add the 'Settings' link in the Plugins list
 			$link = array('<a href="' . admin_url( 'options-general.php?page=reliably_heic' ) . '">' . __( 'Settings', 'reliably_heic' ) . '</a>');
 			return array_merge($actions, $link);
 		}
@@ -44,8 +46,11 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			return $mime_types;
 		}
 
+		/** 
+		 * Arguably disables the 'This image cannot be displayed in a web browser. For best results, convert it to JPEG before uploading.' message
+		 * ... arguably. (See the double combo of add_filter/remove_filter in the plugin initialisation method).
+		 */
 		public function allow_heic_upload($settings) {
-			// Arguably disables the 'This image cannot be displayed in a web browser. For best results, convert it to JPEG before uploading.' message
 			$settings['heic_upload_error'] = false;
 			return $settings;
 		}
@@ -66,7 +71,6 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			$output_path = $input_path . '.jpg';
 			
 			try {
-				// TODO resizing if configured etc
 				$this->save_image_for_browser($input_path, $output_path);
 				
 				// Swaaap!
@@ -117,19 +121,17 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			add_settings_section(
 				$section_id,
 				'Configuration',
-				function() {
-					//echo 'before the list of settings';
-				},
+				function() { },
 				$this->settings_page_name
 			);
 
 			
 			register_setting(
 				$this->settings_page_name,
-				$this->setting_experimental_id, //'reliably-heic-experimental-front-end', 
+				$this->setting_experimental_id, 
 				array(
 					'type'              => 'boolean',
-					'description'       => $this->setting_experimental_description, //'Perform HEIC image conversions in the browser (EXPERIMENTAL)',
+					'description'       => $this->setting_experimental_description,
 					'sanitize_callback' => 'rest_sanitize_boolean',
 					'show_in_rest'      => true
 				)
@@ -138,8 +140,8 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			add_option($this->setting_experimental_id, false);
 
 			add_settings_field(
-				$this->setting_experimental_id, //  field id
-				$this->setting_experimental_description, //'Enable front-end HEIC to JPEG image conversion', // field title
+				$this->setting_experimental_id,
+				$this->setting_experimental_description,
 				array($this, 'enable_setting_callback'),
 				$this->settings_page_name,
 				$section_id,
@@ -154,7 +156,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 		function enable_setting_callback() {
 			$id = $this->setting_experimental_id;
 
-			$value = get_option($id /*'reliably-heic-experimental-front-end'*/);
+			$value = get_option($id);
 
 			printf(
 				'<input type="checkbox" id="%s" name="%s" %s/> <label for="%s">%s</label><p class="description">%s</p>',
@@ -168,15 +170,15 @@ if(!class_exists('ReliablyHEICPlugin')) {
 		}
 
 		/**
-		Note:
-		The interceptable uploader seems to only be set up in media-new.php ('Add new')
-		So even if you CAN upload files with drag and drop in upload.php (the page which the top 'Media' links to),
-		I have not figured out how to intercept that uploader yet, thus HEIC conversion client side won't happen there.
-		Go to 'Add new' to get it working.
-		*/
+		 * Note:
+		 *	The interceptable uploader seems to only be set up in media-new.php ('Add new').
+		 *	So even if you CAN upload files with drag and drop in upload.php (the page which the top 'Media' links to),
+		 *	I have not figured out how to intercept that uploader yet, thus HEIC conversion client side won't happen there.
+		 *	Go to 'Add new' to get it working.
+		 */
 		public function add_js_to_media_new($hook) {
 			
-			if(!in_array($hook, ['media-new.php' /*, 'upload.php'*/])) {
+			if(!in_array($hook, ['media-new.php' /*, 'upload.php'*/])) { // Maybe something for the future
 				return;
 			}
 			
@@ -197,13 +199,15 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			<div class="wrap">
 			<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 			<?php
+				// This feels like I'm doing something wrong, but I can't figure out
+				// how to do it "the right WP way" (maybe there is no such thing).
 				if(isset($_POST['submit'])) {
 					$value = isset($_POST[$this->setting_experimental_id]);
 					update_option($this->setting_experimental_id, $value);
 				}
 			?>
 			
-			<form method="post" action2="options.php" action="options-general.php?page=reliably_heic" novalidate="novalidate">
+			<form method="post" action="options-general.php?page=reliably_heic" novalidate="novalidate">
 			<?php
 				do_settings_sections($this->settings_page_name);
 				submit_button();

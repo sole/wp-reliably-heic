@@ -123,7 +123,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 
 			
 			register_setting(
-				'media',
+				$this->settings_page_name,
 				$this->setting_experimental_id, //'reliably-heic-experimental-front-end', 
 				array(
 					'type'              => 'boolean',
@@ -133,12 +133,17 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				)
 			);
 
+			add_option($this->setting_experimental_id, false);
+
 			add_settings_field(
-				'enable', //  field id
+				$this->setting_experimental_id, //  field id
 				$this->setting_experimental_description, //'Enable front-end HEIC to JPEG image conversion', // field title
 				array($this, 'enable_setting_callback'),
 				$this->settings_page_name,
-				$section_id
+				$section_id,
+				array(
+					'option_name' => $this->setting_experimental_id
+				)
 			);
 
 			
@@ -148,7 +153,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			$id = $this->setting_experimental_id;
 
 			$value = get_option($id /*'reliably-heic-experimental-front-end'*/);
-error_log('value is '. print_r($value, 1));
+
 			printf(
 				'<input type="checkbox" id="%s" name="%s" %s/> <label for="%s">%s</label><p class="description">%s</p>',
 				$id,
@@ -189,17 +194,20 @@ error_log('value is '. print_r($value, 1));
 			?>
 			<div class="wrap">
 			<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-			
-			<form method="post" action="options-general.php?page=reliably_heic" novalidate="novalidate">
 			<?php
-				
-				do_settings_sections($this->settings_page_name);
-				
+				if(isset($_POST['submit'])) {
+					$value = isset($_POST[$this->setting_experimental_id]);
+					update_option($this->setting_experimental_id, $value);
+				}
 			?>
-			<?php submit_button(); ?>
+			
+			<form method="post" action2="options.php" action="options-general.php?page=reliably_heic" novalidate="novalidate">
+			<?php
+				do_settings_sections($this->settings_page_name);
+				submit_button();
+			?>
 			</form>
 
-			<?php // echo print_r(wp_plupload_default_settings(), 1); ?>
 			<h2>Troubleshooting</h2>
 			<?php if($satisfied) { ?>
 				All in place: the plugin can work correctly!

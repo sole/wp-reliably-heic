@@ -1,15 +1,10 @@
 class HEIF2JPG {
-	constructor(libheif) {
-		this.decoder = new libheif.HeifDecoder();
-	}
 
 	static async getJPGBlob(arrayBuffer, options = []) {
 		let libheif = options.libheif ? options.libheif : window.libheif;
-		let h2j = new HEIF2JPG(libheif);
-		
-		let decodedImages = h2j.convert(arrayBuffer);
+		let decodedImages = HEIF2JPG.convert(arrayBuffer, libheif);
 		if(decodedImages.length === 0) {
-			throw new Exception('h2j: the buffer cannot be decoded as an image');
+			throw new Exception('HEIF2JPG: the buffer cannot be decoded as an image');
 		}
 		let firstImage = decodedImages[0];
 		let canvas = await HEIF2JPG.getCanvasFromImage(firstImage);
@@ -17,9 +12,10 @@ class HEIF2JPG {
 		return blob;
 	}
 
-	convert(buffer) {
-		// buffer is an Uint8Array(?) - the output of FileReader.readAsArrayBuffer(file)
-		let imageData = this.decoder.decode(buffer);
+	// arrayBuffer is an Uint8Array i.e. the output of FileReader.readAsArrayBuffer(file)
+	static convert(arrayBuffer, libheif) {
+		let decoder =  new libheif.HeifDecoder();
+		let imageData = decoder.decode(arrayBuffer);
 		return imageData;
 	}
 

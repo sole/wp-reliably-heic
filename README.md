@@ -1,5 +1,11 @@
 # Reliably HEIC
 
+## Limitations
+
+### Front-end side
+
+It can only intercept uploads to media-new.php.
+
 ## System requirements
 
 ### ImageMagick extension present and activated

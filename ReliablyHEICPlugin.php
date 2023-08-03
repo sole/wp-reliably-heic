@@ -2,6 +2,8 @@
 
 if(!class_exists('ReliablyHEICPlugin')) {
 
+	require_once('HEIC2JPG.php');
+
 	class ReliablyHEICPlugin {
 		public function setup() {
 			$index_path = dirname(plugin_basename(__FILE__)) . '/index.php';
@@ -11,8 +13,8 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			
 			// We shouldn't need this, but apparently we do, because the outcome of the
 			// add_filter underneath is invalidated when some other function undoes
-			// our work later.
-			// So keeping both for good measure!
+			// our work later. So keeping both for good measure!
+			// (And even then it sometimes does not work T_T)
 			remove_filter('plupload_default_settings', 'wp_show_heic_upload_error');
 			add_filter('plupload_default_settings', array($this, 'allow_heic_upload'), 10);
 			
@@ -71,7 +73,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			$output_path = $input_path . '.jpg';
 			
 			try {
-				$this->save_image_for_browser($input_path, $output_path);
+				HEIC2JPG::save_image_for_browser($input_path, $output_path);
 				
 				// Swaaap!
 				rename($output_path, $input_path);
@@ -192,7 +194,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				return;
 			}
 
-			$checks = $this->run_through_system_requirements();
+			$checks = HEIC2JPG::run_through_system_requirements();
 			$satisfied = $this->are_system_requirements_satisfied($checks);
 
 			?>
@@ -237,33 +239,8 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			
 		}
 
-		protected function run_through_system_requirements() {
-			$checks = array(
-				array(
-					'desc' => 'ImageMagick extension present',
-					'func' => 'validate_imagemagick'
-				),
-				array(
-					'desc' => 'ImageMagick extension can decode HEIC',
-					'func' => 'validate_imagemagick_decode_heic'
-				),
-			);
-
-			foreach($checks as &$check) {
-				$callable = array($this, $check['func']);
-				$result = call_user_func($callable);
-				if(isset($result['error'])) {
-					$check['error'] = $result['error'];
-				} else {
-					$check['ok'] = true;
-				}
-			}
-
-			return $checks;
-		}
-
 		protected function can_work() {
-			$checks = $this->run_through_system_requirements();
+			$checks = HEIC2JPG::run_through_system_requirements();
 			return $this->are_system_requirements_satisfied($checks);
 		}
 		protected function are_system_requirements_satisfied($checks) {
@@ -273,49 +250,6 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				}
 			}
 			return true;
-		}
-
-		protected function validate_imagemagick() {
-			$result = array();
-			if(class_exists('Imagick')) {
-				$result['ok'] = true;
-			} else {
-				$result['error'] = 'Imagick class does not exist. Did you activate the ImageMagick PHP module in your server? (<tt>extension=imagick.so</tt> in <tt>php.ini</tt>)';
-			}
-			return $result;
-		}
-
-		protected function validate_imagemagick_decode_heic() {
-			$result = array();
-			if(!class_exists('Imagick')) {
-				$result['error'] = 'Irrelevant error if you already got an ImageMagick error';
-			} else {
-				$im = new Imagick();
-				$v = Imagick::getVersion();
-				$test_image = 'test.heic';
-				$test_image_path = dirname(__FILE__) . '/' . $test_image;
-		
-				try {
-					$im->readImage($test_image_path);
-				} catch(ImagickException $ie) {
-					$result['error'] = 'ImageMagick is present (version <tt>'. $v['versionString'] .'</tt>) but HEIC images cannot be opened: <tt>' . $ie->getMessage() . '</tt>';
-				}
-			}
-			return $result;
-		}
-
-		protected function save_image_for_browser($input_path, $output_path) {
-			$im = new Imagick();
-			if(!$im->readImage($input_path)) {
-				throw new Exception('The image at ' . $input_path . ' could not be read with ImageMagick');
-			}
-
-			$res_format = $im->setImageFormat('jpg');
-			error_log('set format to jpg: ' . $res_format);
-			
-			$ok = $im->writeImage($output_path);
-			error_log('and save image to ' . $output_path . ' = '. $ok);
-			
 		}
 
 	}

@@ -162,7 +162,7 @@ if(!class_exists('ReliablyHEICPlugin')) {
 				$id,
 				checked($value, '1', false),
 				$id,
-				'When ticked, intercepts HEIC file uploads from the media/Add new section, and tries to convert them to JPG in the browser',
+				'When ticked, intercepts HEIC file uploads from the <a href="media-new.php">Media/Add new</a> section, and tries to convert them to JPG in the browser.',
 				'This is highly experimental, but if it works then you do not depend on your hosting company to update or install a recent version of ImageMagick.'
 			);
 		}

@@ -30,44 +30,30 @@
 	function onFilesAdded(uploader, files) {
 		console.log("files added", uploader);
 		console.info(files);
-		// uploader.files seems to have the files that have been added
 		
-		_.each(files, async function(up, file) {
-			// TODO why am I using this each thing? this should work in modern browsers...
-			// I should probably get rid of this
-
-			// file is just the file key in the files object, not the actual file object
-			// so removeFile(file) has no actual effect
-			let f = files[file];
-			if(f.type !== 'image/heic') {
-				console.log('Not an heic, benevolently ignoring ', f.type);
-				return;
+		files.filter((file) => {
+			let rightType = file.type === 'image/heic';
+			if(!rightType) {
+				console.log('Not an heic, filtering out', file);
 			}
+			return rightType;
+		}).forEach(async (file) => {
+			let nativeFile = file.getNative(); // This is the actual File instance in the browser
+			let arrayBuffer = await nativeFile.arrayBuffer();
+			let jpgBlob = await HEIF2JPG.getJPGBlob(arrayBuffer);
+			let jpgFile = new File([jpgBlob], 'from heic!!.jpg');
 			
-			console.log(f);
-
-			try {
-				let nativeFile = f.getNative(); // This is the actual File instance in the browser
-				let arrayBuffer = await nativeFile.arrayBuffer();
-				let jpgBlob = await HEIF2JPG.getJPGBlob(arrayBuffer);
-				let jpgFile = new File([jpgBlob], 'from heic!!.jpg');
-				
-				// Calling uploader.addFile() will trigger the FilesAdded again,
-				// but it's OK because we skip non HEIC files.
-				// So you shouldn't enter an infinite loop.
-				uploader.addFile(jpgFile);					
-			} catch(e) {
-				console.error('horrible exception, the end of the days, etc');
-				console.trace(e);
-			}
-
-			uploader.removeFile(files[file]);
-		
-			return false;
+			// Calling uploader.addFile() will trigger the FilesAdded again,
+			// but it's OK because we skip non HEIC files.
+			// So you shouldn't enter an infinite loop.
+			uploader.addFile(jpgFile);					
 			
+			console.log('remove the file', file);
+			uploader.removeFile(file);
 		});
+
 		// I THINK if you return false nothing else in the list of event handlers gets executed?? which means WP stops updating its ui so you don't get any progress updates. Not good, but you also don't get the ghost HEIC file which will never go away
-		//return true;
+		// return true;
 	}
 
 })();

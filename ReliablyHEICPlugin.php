@@ -23,9 +23,11 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			$this->setting_experimental_description = 'Enable front-end HEIC to JPEG image conversion';
 
 			add_action('admin_menu', array($this, 'setup_admin_menu'));
-
 			
-			add_action('admin_enqueue_scripts', array($this, 'add_js_to_media_new'));
+			// Only load the JS scripts if the experimental setting is ON
+			if(get_option($this->setting_experimental_id)) {
+				add_action('admin_enqueue_scripts', array($this, 'add_js_to_media_new'));
+			}
 		}
 
 		public function add_plugin_settings_link($actions) {

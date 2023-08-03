@@ -32,7 +32,7 @@
 		console.info(files);
 		// uploader.files seems to have the files that have been added
 		
-		_.each(files, function(up, file) {
+		_.each(files, async function(up, file) {
 			// TODO why am I using this each thing? this should work in modern browsers...
 			// I should probably get rid of this
 
@@ -42,34 +42,21 @@
 			if(f.type === 'image/heic') {
 				console.log(f);
 
-				let native = f.getNative(); // This is the actual File instance in the browser
-
-				let fr = new FileReader();
-				fr.addEventListener('load', (e) => {
-					let buffer = e.target.result;
-					let h2j = new HEIF2JPG(libheif);
-					let jpg = h2j.convert(buffer);
-
-					if(jpg.length === 0) {
-						console.error('h2j could not decode anything');
-					} else {
-						console.info('decoded', jpg.length);
-					}
-
-					let img = jpg[0];
-					let w = img.get_width();
-					let h = img.get_height();
-					console.log('Decoded: ', w, h);
-					HEIFImageToJPEGBlob(img, (blob) => {
-						console.log('please let the end be soon');
-						let jpgFile = new File([blob], 'from-heic.jpg');
-						// Calling uploader.addFile() will trigger files added again
-						// but it's OK because we skip non HEIC
-						uploader.addFile(jpgFile);
-					});
+				try {
+					let nativeFile = f.getNative(); // This is the actual File instance in the browser
+					let arrayBuffer = await nativeFile.arrayBuffer();
+					console.log('my array buffer', arrayBuffer);
+					let jpgBlob = await HEIF2JPG.getJPGBlob(arrayBuffer);
+					let jpgFile = new File([jpgBlob], 'from heic!!.jpg');
 					
-				});
-				fr.readAsArrayBuffer(native);
+					// Calling uploader.addFile() will trigger the FilesAdded again,
+					// but it's OK because we skip non HEIC files.
+					// So you shouldn't enter an infinite loop.
+					uploader.addFile(jpgFile);					
+				} catch(e) {
+					console.error('horrible exception, the end of the days, etc');
+					console.trace(e);
+				}
 
 				uploader.removeFile(files[file]);
 			
@@ -82,20 +69,4 @@
 		//return true;
 	}
 
-	function HEIFImageToJPEGBlob(image, cb) {
-		console.log('HEIFImageToJPEGBlob');
-		let canvas = document.createElement('canvas');
-		canvas.width = image.get_width();
-		canvas.height = image.get_height();
-		ctx = canvas.getContext('2d');
-		ctx.fillStyle = '#fff';
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		let imageData = ctx.createImageData(canvas.width, canvas.height);
-		// This method should be called decodeAgain!
-		image.display(imageData, (decodedImageData) => {
-			console.log("arguably finished???");
-			ctx.putImageData(decodedImageData, 0, 0);
-			canvas.toBlob(cb, { type: 'image/jpeg' }, 0.1);
-		});
-	}
 })();

@@ -41,7 +41,9 @@
 			let nativeFile = file.getNative(); // This is the actual File instance in the browser
 			let arrayBuffer = await nativeFile.arrayBuffer();
 			let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer);
-			let jpgFile = new File([jpgBlob], 'from heic!!.jpg');
+			let originalName = file.name;
+			let newName = originalName.replace(/HEIC$/i, 'JPG');
+			let jpgFile = new File([jpgBlob], newName);
 			
 			// Calling uploader.addFile() will trigger the FilesAdded again,
 			// but it's OK because we skip non HEIC files.

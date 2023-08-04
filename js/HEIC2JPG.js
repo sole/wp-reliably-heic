@@ -20,7 +20,6 @@ class HEIC2JPG {
 	}
 
 	static async getCanvasFromImage(libheifImage) {
-		console.log('getCanvasFromImage')
 		let canvas = document.createElement('canvas');
 		canvas.width = libheifImage.get_width();
 		canvas.height = libheifImage.get_height();
@@ -39,9 +38,9 @@ class HEIC2JPG {
 	}
 
 	static async getCanvasAsJPGBlob(canvas, quality = 1.0) {
-		console.log('getCanvasAsJPGBlob')
 		return new Promise((res) => {
 			canvas.toBlob(res, { type: 'image/jpeg' }, quality);
 		});
 	}
+	
 }

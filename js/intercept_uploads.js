@@ -44,18 +44,28 @@
 			let originalName = file.name;
 			let newName = originalName.replace(/HEIC$/i, 'JPG');
 			let jpgFile = new File([jpgBlob], newName);
+			console.info(newName, ' = ', jpgBlob.size, 'bytes', roughlyMegaBytesSize(jpgBlob.size));
 			
 			// Calling uploader.addFile() will trigger the FilesAdded again,
 			// but it's OK because we skip non HEIC files.
 			// So you shouldn't enter an infinite loop.
 			uploader.addFile(jpgFile);					
 			
-			console.log('remove the file', file);
 			uploader.removeFile(file);
 		});
 
 		// I THINK if you return false nothing else in the list of event handlers gets executed?? which means WP stops updating its ui so you don't get any progress updates. Not good, but you also don't get the ghost HEIC file which will never go away
 		// return true;
+	}
+
+	function roughlyMegaBytesSize(n) {
+		let div = n / (1024*1024);
+		if(div>1) {
+			let megas = Math.round(div);
+			return `~${megas}Mb`;
+		} else {
+			return n;
+		}
 	}
 
 })();

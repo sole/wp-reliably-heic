@@ -30,6 +30,9 @@
 	function onFilesAdded(uploader, files) {
 		console.log("files added", uploader);
 		console.info(files);
+
+		// Just how many times do we have to hide this, I wonder? it's a joke by now!
+		document.querySelector('#media-upload-error').hidden = true;
 		
 		files.filter((file) => {
 			let rightType = file.type === 'image/heic';

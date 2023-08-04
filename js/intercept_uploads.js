@@ -51,7 +51,15 @@
 			// So you shouldn't enter an infinite loop.
 			uploader.addFile(jpgFile);					
 			
+			// This removes the file from the pluploader instance (and from its queue)
 			uploader.removeFile(file);
+
+			// And this is for removing it from the visible list of uploads in the UI
+			let item = document.querySelector( '#media-item-' + file.id );
+			if(item) {
+				item.parentElement.removeChild(item);
+			}
+
 		});
 
 		// I THINK if you return false nothing else in the list of event handlers gets executed?? which means WP stops updating its ui so you don't get any progress updates. Not good, but you also don't get the ghost HEIC file which will never go away

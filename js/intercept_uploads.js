@@ -48,7 +48,9 @@
 		}).forEach(async (file) => {
 			let nativeFile = file.getNative(); // This is the actual File instance in the browser
 			let arrayBuffer = await nativeFile.arrayBuffer();
-			let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer);
+			let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer, {
+				maxWidth: 2048
+			});
 			let originalName = file.name;
 			let newName = originalName.replace(/HEIC$/i, 'JPG');
 			let jpgFile = new File([jpgBlob], newName);

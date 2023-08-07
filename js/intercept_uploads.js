@@ -36,9 +36,6 @@
 
 	function onFilesAdded(uploader, files) {
 		
-		// Just how many times do we have to hide this, I wonder? it's a joke by now!
-		//document.querySelector('#media-upload-error').hidden = true;
-		
 		files.filter((file) => {
 			let rightType = file.type === 'image/heic';
 			if(!rightType) {
@@ -47,26 +44,28 @@
 			return rightType;
 		}).forEach(async (file) => {
 			let nativeFile = file.getNative(); // This is the actual File instance in the browser
+			let originalName = file.name;
+			let newName = originalName.replace(/HEIC$/i, 'JPG');
 
 			hideHeicUploadError();
 			removeFileFromUploadsUI(file.id);
 			cancelFileUpload(uploader, file);
 		
 			if(true) {
-
-				let arrayBuffer = await nativeFile.arrayBuffer();
+				
+				/*let arrayBuffer = await nativeFile.arrayBuffer();
 				let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer, {
 					maxWidth: 2048
 				});
-				let originalName = file.name;
-				let newName = originalName.replace(/HEIC$/i, 'JPG');
-				let jpgFile = new File([jpgBlob], newName);
-				console.info(newName, ' = ', jpgBlob.size, 'bytes', roughlyMegaBytesSize(jpgBlob.size));
+				
+				let jpgFile = new File([jpgBlob], newName);*/
+				let jpgFile = await getJPGFile(nativeFile, newName);
+				console.info(newName, ' = ', jpgFile.size, 'bytes', roughlyMegaBytesSize(jpgFile.size));
 				
 				// Calling uploader.addFile() will trigger the FilesAdded again,
 				// but it's OK because we skip non HEIC files.
 				// So you shouldn't enter an infinite loop.
-				uploader.addFile(jpgFile);		
+				uploader.addFile(jpgFile);		//xxx
 			}
 		});
 
@@ -98,8 +97,28 @@
 		});
 	}
 
+	async function getJPGFile(nativeFile, jpgName) {
+		console.log('getJPGFile 1');
+		return new Promise(async (res) => {
+			console.log('getJPGFile 2');
+			let arrayBuffer = await nativeFile.arrayBuffer();
+			console.log('getJPGFile 3');
+			let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer, {
+				maxWidth: 2048
+			});
+			console.log('getJPGFile 4');
+			
+			let jpgFile = new File([jpgBlob], jpgName);
+			console.log('getJPGFile 5');
+			res(jpgFile);
+		});
+	}
 	
-	
+	function createFileUpload(uploader, file) {
+		doRightAfter(() => {
+			uploader.addFile(file);
+		});
+	}
 
 	// Sigh.
 	function doRightAfter(callable) {

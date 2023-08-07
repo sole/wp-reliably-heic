@@ -11,7 +11,8 @@ class HEIC2JPG {
 		}
 		let firstImage = decodedImages[0];
 		let canvas = await HEIC2JPG.getCanvasFromImage(firstImage, { maxWidth, maxHeight });
-		let blob = await HEIC2JPG.getCanvasAsJPGBlob(canvas);
+		let blob = await HEIC2JPG.getCanvasAsJPGBlob(canvas, 0.85);
+		console.log(blob);
 		return blob;
 	}
 
@@ -31,25 +32,21 @@ class HEIC2JPG {
 		let finalHeight = imageHeight;
 
 		console.log('Read image dimensions', imageWidth, imageHeight);
-
-		//if(maxWidth > 0 || maxHeight > 0) {
+		
+		let heightRatio = maxWidth * 1.0 / imageWidth;
+		let widthRatio = maxHeight * 1.0 / imageHeight;
+		let ratios = [ widthRatio, heightRatio ];
+		
+		// Filter out if either max was set as -1 (default)
+		ratios = ratios.filter(r => r > 0);
+		let finalRatio = Math.min(ratios);
+		if(ratios.length > 0 && finalRatio < 1) {
+			finalWidth = Math.round(imageWidth * finalRatio);
+			finalHeight = Math.round(imageHeight * finalRatio);
 			console.log('Resizing incoming!!')
-			let heightRatio = maxWidth * 1.0 / imageWidth;
-			let widthRatio = maxHeight * 1.0 / imageHeight;
-			let ratios = [ widthRatio, heightRatio ];
-			
-			// Filter out if either max was set as -1 (default)
-			ratios = ratios.filter(r => r > 0);
-			let finalRatio = Math.min(ratios);
-			if(ratios.length > 0 && finalRatio < 1) {
-				finalWidth = Math.round(imageWidth * finalRatio);
-				finalHeight = Math.round(imageHeight * finalRatio);
-				console.log(finalRatio, 'Final sizes should be ', finalWidth, finalHeight);
-			}
-		//} else {
-		//	console.log('The image is not bigger than the maximums', maxWidth, maxHeight);
-		//}
-
+			console.log(finalRatio, 'Final sizes should be ', finalWidth, finalHeight);
+		}
+		
 		canvas.width = imageWidth;
 		canvas.height = imageHeight;
 		let ctx = canvas.getContext('2d');
@@ -75,7 +72,7 @@ class HEIC2JPG {
 
 	static async getCanvasAsJPGBlob(canvas, quality = 1.0) {
 		return new Promise((res) => {
-			canvas.toBlob(res, { type: 'image/jpeg' }, quality);
+			canvas.toBlob(res, 'image/jpeg', quality);
 		});
 	}
 

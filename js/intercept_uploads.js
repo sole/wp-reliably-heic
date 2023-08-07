@@ -51,22 +51,14 @@
 			removeFileFromUploadsUI(file.id);
 			cancelFileUpload(uploader, file);
 		
-			if(true) {
-				
-				/*let arrayBuffer = await nativeFile.arrayBuffer();
-				let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer, {
-					maxWidth: 2048
-				});
-				
-				let jpgFile = new File([jpgBlob], newName);*/
-				let jpgFile = await getJPGFile(nativeFile, newName);
-				console.info(newName, ' = ', jpgFile.size, 'bytes', roughlyMegaBytesSize(jpgFile.size));
-				
-				// Calling uploader.addFile() will trigger the FilesAdded again,
-				// but it's OK because we skip non HEIC files.
-				// So you shouldn't enter an infinite loop.
-				uploader.addFile(jpgFile);		//xxx
-			}
+			let jpgFile = await getJPGFile(nativeFile, newName);
+			console.info(newName, ' = ', jpgFile.size, 'bytes', roughlyMegaBytesSize(jpgFile.size));
+			
+			// Calling uploader.addFile() will trigger the FilesAdded again,
+			// but it's OK because we skip non HEIC files.
+			// So you shouldn't enter an infinite loop.
+			
+			createFileUpload(uploader, jpgFile);
 		});
 
 	}

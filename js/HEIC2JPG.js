@@ -86,8 +86,10 @@ class HEIC2JPG {
 				resizedCanvas.width = finalWidth;
 				resizedCanvas.height = finalHeight;
 				let ctx = resizedCanvas.getContext('2d');
+				console.log('before drawing image');
 				ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, finalWidth, finalHeight);
 				res(resizedCanvas);
+				console.log('after drawing image');
 			}
 		});
 	}

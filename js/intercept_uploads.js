@@ -37,7 +37,7 @@
 	function onFilesAdded(uploader, files) {
 		
 		// Just how many times do we have to hide this, I wonder? it's a joke by now!
-		document.querySelector('#media-upload-error').hidden = true;
+		//document.querySelector('#media-upload-error').hidden = true;
 		
 		files.filter((file) => {
 			let rightType = file.type === 'image/heic';
@@ -47,31 +47,63 @@
 			return rightType;
 		}).forEach(async (file) => {
 			let nativeFile = file.getNative(); // This is the actual File instance in the browser
-			let arrayBuffer = await nativeFile.arrayBuffer();
-			let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer, {
-				maxWidth: 2048
-			});
-			let originalName = file.name;
-			let newName = originalName.replace(/HEIC$/i, 'JPG');
-			let jpgFile = new File([jpgBlob], newName);
-			console.info(newName, ' = ', jpgBlob.size, 'bytes', roughlyMegaBytesSize(jpgBlob.size));
-			
-			// Calling uploader.addFile() will trigger the FilesAdded again,
-			// but it's OK because we skip non HEIC files.
-			// So you shouldn't enter an infinite loop.
-			uploader.addFile(jpgFile);					
-			
-			// This removes the file from the pluploader instance (and from its queue)
-			uploader.removeFile(file);
 
-			// And this is for removing it from the visible list of uploads in the UI
-			let item = document.querySelector( '#media-item-' + file.id );
+			hideHeicUploadError();
+			removeFileFromUploadsUI(file.id);
+			cancelFileUpload(uploader, file);
+		
+			if(true) {
+
+				let arrayBuffer = await nativeFile.arrayBuffer();
+				let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer, {
+					maxWidth: 2048
+				});
+				let originalName = file.name;
+				let newName = originalName.replace(/HEIC$/i, 'JPG');
+				let jpgFile = new File([jpgBlob], newName);
+				console.info(newName, ' = ', jpgBlob.size, 'bytes', roughlyMegaBytesSize(jpgBlob.size));
+				
+				// Calling uploader.addFile() will trigger the FilesAdded again,
+				// but it's OK because we skip non HEIC files.
+				// So you shouldn't enter an infinite loop.
+				uploader.addFile(jpgFile);		
+			}
+		});
+
+	}
+
+	// Removes an entry from the visible list of uploads in the UI
+	function removeFileFromUploadsUI(fileId) {
+		doRightAfter(() => {
+			let itemId = '#media-item-' + fileId;
+			let item = document.querySelector( itemId );
+			console.log(itemId, item);
 			if(item) {
 				item.parentElement.removeChild(item);
 			}
-
 		});
+	}
 
+	// This removes the file from the pluploader instance (and from its queue)
+	function cancelFileUpload(uploader, file) {
+		doRightAfter(() => {
+			uploader.removeFile(file);
+		});
+	}
+
+	function hideHeicUploadError() {
+		doRightAfter(() => {
+			// Just how many times do we have to hide this, I wonder? it's a joke by now!
+			document.querySelector('#media-upload-error').hidden = true;
+		});
+	}
+
+	
+	
+
+	// Sigh.
+	function doRightAfter(callable) {
+		setTimeout(callable, 1);
 	}
 
 	function roughlyMegaBytesSize(n) {

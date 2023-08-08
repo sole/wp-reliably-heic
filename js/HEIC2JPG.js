@@ -7,7 +7,7 @@ class HEIC2JPG {
 
 		let decodedImages = HEIC2JPG.convert(arrayBuffer, libheif);
 		if(decodedImages.length === 0) {
-			throw new Exception('HEIF2JPG: the buffer cannot be decoded as an image');
+			throw new Error('HEIC2JPG: the buffer cannot be decoded as an image');
 		}
 		let firstImage = decodedImages[0];
 		let canvas = await HEIC2JPG.getCanvasFromImage(firstImage, { maxWidth, maxHeight });
@@ -54,9 +54,11 @@ class HEIC2JPG {
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		let imageData = ctx.createImageData(canvas.width, canvas.height);
 		return new Promise((res, rej) => {
-			// TODO: it would be nice to know what errors can occur, and `rej` if so
 			libheifImage.display(imageData, async (decodedImageData) => {
-				console.log('image is decoded');
+				console.log('decoding finished');
+				if(imageData === null) {
+					rej('Decoding failed at libheif level');
+				}
 				ctx.putImageData(decodedImageData, 0, 0);
 				
 				if(finalWidth !== imageWidth || finalHeight !== imageHeight) {

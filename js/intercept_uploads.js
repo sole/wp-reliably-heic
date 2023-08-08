@@ -51,14 +51,17 @@
 			removeFileFromUploadsUI(file.id);
 			cancelFileUpload(uploader, file);
 		
-			let jpgFile = await getJPGFile(nativeFile, newName);
-			console.info(newName, ' = ', jpgFile.size, 'bytes', roughlyMegaBytesSize(jpgFile.size));
-			
-			// Calling uploader.addFile() will trigger the FilesAdded again,
-			// but it's OK because we skip non HEIC files.
-			// So you shouldn't enter an infinite loop.
-			
-			createFileUpload(uploader, jpgFile);
+			try {
+				let jpgFile = await getJPGFile(nativeFile, newName);
+				console.info(newName, ' = ', jpgFile.size, 'bytes', roughlyMegaBytesSize(jpgFile.size));
+				
+				// Calling uploader.addFile() will trigger the FilesAdded again,
+				// but it's OK because we skip non HEIC files.
+				// So you shouldn't enter an infinite loop.
+				createFileUpload(uploader, jpgFile);
+			} catch (e) {
+				console.error(e);
+			}
 		});
 
 	}
@@ -91,18 +94,22 @@
 
 	async function getJPGFile(nativeFile, jpgName) {
 		console.log('getJPGFile 1');
-		return new Promise(async (res) => {
-			console.log('getJPGFile 2');
-			let arrayBuffer = await nativeFile.arrayBuffer();
-			console.log('getJPGFile 3');
-			let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer, {
-				maxWidth: 2048
-			});
-			console.log('getJPGFile 4');
-			
-			let jpgFile = new File([jpgBlob], jpgName);
-			console.log('getJPGFile 5');
-			res(jpgFile);
+		return new Promise(async (res, rej) => {
+			try {
+				console.log('getJPGFile 2');
+				let arrayBuffer = await nativeFile.arrayBuffer();
+				console.log('getJPGFile 3');
+				let jpgBlob = await HEIC2JPG.getJPGBlob(arrayBuffer, {
+					maxWidth: 2048
+				});
+				console.log('getJPGFile 4');
+				
+				let jpgFile = new File([jpgBlob], jpgName);
+				console.log('getJPGFile 5');
+				res(jpgFile);
+			} catch(e) {
+				rej(e);
+			}
 		});
 	}
 	

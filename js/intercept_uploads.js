@@ -1,6 +1,7 @@
 // periodically polls (urgh) until an 'uploader' object shows up in the global scope
 (() => {
 	let tries = 0;
+	let activityIndicator = null;
 	findUploader();
 
 	function findUploader() {
@@ -30,7 +31,8 @@
 		// If we show this, then users don't need to look at the console output
 		let h1 = document.querySelector('#wpbody .wrap h1');
 		if(h1) {
-			h1.innerHTML += ' <sup style="background: #ffe; padding: 3px; position: relative; top: -0.5em; font-size: 60%; font-style: italic;">with <b>EXPERIMENTAL</b> HEIC to JPEG support</sup>';
+			h1.innerHTML += ' <sup style="background: #ffe; padding: 3px; position: relative; top: -0.5em; font-size: 60%; font-style: italic;">with <b>EXPERIMENTAL</b> HEIC to JPEG support<span id="activityIndicator"></span></sup>';
+			activityIndicator = document.getElementById('activityIndicator');
 		}
 	}
 
@@ -52,6 +54,7 @@
 			cancelFileUpload(uploader, file);
 		
 			try {
+				displayActivity(true);
 				let jpgFile = await getJPGFile(nativeFile, newName);
 				console.info(newName, ' = ', jpgFile.size, 'bytes', roughlyMegaBytesSize(jpgFile.size));
 				
@@ -59,8 +62,10 @@
 				// but it's OK because we skip non HEIC files.
 				// So you shouldn't enter an infinite loop.
 				createFileUpload(uploader, jpgFile);
+				displayActivity(false);
 			} catch (e) {
 				console.error(e);
+				displayActivity(false);
 			}
 		});
 
@@ -131,6 +136,18 @@
 			return `~${megas}Mb`;
 		} else {
 			return n;
+		}
+	}
+
+	function displayActivity(status) {
+		let activeClass = 'active';
+
+		if(activityIndicator) {
+			if(status) {
+				activityIndicator.classList.add(activeClass);
+			} else {
+				activityIndicator.classList.remove(activeClass);
+			}
 		}
 	}
 

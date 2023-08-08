@@ -1,0 +1,29 @@
+#activityIndicator {
+	width: 0.5vw;
+	height: 0.5vw;
+	background: #fff;
+	border: 1px dotted black;
+	display: inline-block;
+	margin-left: 0.5vw;
+	border-radius: 0;
+}
+
+#activityIndicator.active {
+	animation: 4s ease-in-out 1s infinite alternate-reverse activityON;
+}
+
+@keyframes activityON {
+	from {
+		transform: rotateZ(-359deg);
+		background-color: #f00;
+		border-color: rgba(255, 255, 255, 0);
+		border-radius: 0.5vw;
+	}
+
+	to {
+		transform: rotateZ(0);
+		background-color: #fff;
+		border-color: #000;
+		border-radius: 0;
+	}
+  }

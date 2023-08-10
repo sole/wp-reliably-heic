@@ -89,6 +89,10 @@ I have left a fair amount of logging in the most critical parts (mostly around h
 * If you are trying to figure out what's happening in the back-end, look at the `error.log` file or wherever the `error_log()` statements are printed in your system.
 * In the front-end, look at the console in your browser's developer tools.
 
+## License
+
+This plug-in is distributed under the terms of the GNU General Public License v3. You can read the [license file](./LICENSE.md).
+
 ## Credits
 
-This plugin uses the JavaScript port of [libheif](https://github.com/strukturag/libheif/tree/master) for the client-side conversion of files. `libheif` is distributed under the terms of the GNU Lesser General Public License.
+This plugin uses the JavaScript port of [libheif](https://github.com/strukturag/libheif/tree/master) for the client-side decoding of HEIC files. `libheif` is distributed under the terms of the GNU Lesser General Public License.

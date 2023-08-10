@@ -11,7 +11,7 @@ _Always bet on JavaScript_, etc.
 
 When the front-end fallback is enabled, it will display a little message next to the *Upload new media* heading, like this:
 
-![media-new interface](assets/media-new.png)
+![media-new interface](assets/screenshot-1.png)
 
 If you don't see that message after installing _and_ activating the plug-in, that means that you haven't enabled that in the plugin settings (it is not enabled by default).
 
@@ -37,12 +37,12 @@ You can check if the back-end will work by installing the plug-in and then visit
 If any requirement is missing, you might want to either try to tinker with your server settings (if it's at all possible--I have some pointers below) or try ticking the `Enable front-end HEIC to JPEG image conversion` option, save changes and then try uploading again.
 
 This is how it looks like if all the requirements are in place:
-![up to date ImageMagick](assets/reqs-new-imagemagick.png)
+![up to date ImageMagick](assets/screenshot-2.png)
 
 And when you have an old or malfunctioning version of ImageMagick:
-![up to date ImageMagick](assets/reqs-old-imagemagick.png)
+![up to date ImageMagick](assets/screenshot-3.png)
 
-Note the error message at the bottom, and the enabled front-end, as otherwise I can't upload images to that WordPress installation.
+Note the error message at the bottom, and the enabled front-end image conversion, as otherwise I would not be able to upload HEIC images to that WordPress installation.
 
 ### Front-end side
 

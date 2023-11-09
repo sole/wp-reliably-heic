@@ -1,10 +1,10 @@
 <?php
 
-if(!class_exists('ReliablyHEICPlugin')) {
+if(!class_exists('RHEIC_Plugin')) {
 
 	require_once('HEIC2JPG.php');
 
-	class ReliablyHEICPlugin {
+	class RHEIC_Plugin {
 		public function setup() {
 			$index_path = dirname(plugin_basename(__FILE__)) . '/index.php';
 			add_filter('plugin_action_links_' . $index_path, array($this, 'add_plugin_settings_link' ));

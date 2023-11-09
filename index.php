@@ -2,7 +2,7 @@
 
 /*
  * Plugin Name:       Reliably HEIC
- * Plugin URI:        https://example.com/plugins/the-basics/
+ * Plugin URI:        https://soledadpenades.com/projects/wordpress/reliably-heic/
  * Description:       Reliably support HEIC files in WordPress
  * Version:           1.1.0
  * Author:            Soledad Penadés
@@ -12,7 +12,7 @@
 
  defined( 'ABSPATH' ) || exit;
 
- require_once('ReliablyHEICPlugin.php');
+ require_once('RHEIC_Plugin.php');
 
- $plugin = new ReliablyHEICPlugin();
+ $plugin = new RHEIC_Plugin();
  $plugin->setup();

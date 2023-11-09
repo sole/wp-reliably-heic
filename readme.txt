@@ -4,7 +4,7 @@ Donate link: https://soledadpenades.com/projects/wordpress/#donate
 Tags: heic, heif, iphone, ios, jpg, jpeg, front-end
 Requires at least: 6.2.2
 Tested up to: 6.3
-Stable tag: 1.0
+Stable tag: 1.1.0
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html

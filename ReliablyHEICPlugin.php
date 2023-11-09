@@ -162,10 +162,10 @@ if(!class_exists('ReliablyHEICPlugin')) {
 
 			printf(
 				'<input type="checkbox" id="%s" name="%s" %s/> <label for="%s">%s</label><p class="description">%s</p>',
-				$id,
-				$id,
+				esc_attr($id),
+				esc_attr($id),
 				checked($value, '1', false),
-				$id,
+				esc_attr($id),
 				'When ticked, intercepts HEIC file uploads from the <a href="media-new.php">Media/Add new</a> section, and tries to convert them to JPG in the browser.',
 				'This is highly experimental, but if it works then you do not depend on your hosting company to update or install a recent version of ImageMagick.'
 			);
@@ -221,13 +221,16 @@ if(!class_exists('ReliablyHEICPlugin')) {
 			<?php if($satisfied) { ?>
 				All in place: the plugin can work correctly!
 			<?php } else {
+				$allowed_tags = array(
+					'tt' => []
+				);
 				?>
 				<p>Requirements missing:</p>
 				<ul>
 				<?php
 				foreach($checks as $check) {
 					if(isset($check['error'])) {
-						echo '<li><strong>' . $check['desc'] .':</strong> ' . $check['error'] . '</li>';
+						echo '<li><strong>' . wp_kses($check['desc'], $allowed_tags) .':</strong> ' . wp_kses($check['error'], $allowed_tags) . '</li>';
 					}
 				}
 				?>

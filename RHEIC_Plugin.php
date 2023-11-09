@@ -2,7 +2,7 @@
 
 if(!class_exists('RHEIC_Plugin')) {
 
-	require_once('HEIC2JPG.php');
+	require_once('RHEIC_HEIC2JPG.php');
 
 	class RHEIC_Plugin {
 		public function setup() {
@@ -73,7 +73,7 @@ if(!class_exists('RHEIC_Plugin')) {
 			$output_path = $input_path . '.jpg';
 			
 			try {
-				HEIC2JPG::save_image_for_browser($input_path, $output_path);
+				RHEIC_HEIC2JPG::save_image_for_browser($input_path, $output_path);
 				
 				// Swaaap!
 				rename($output_path, $input_path);
@@ -195,7 +195,7 @@ if(!class_exists('RHEIC_Plugin')) {
 				return;
 			}
 
-			$checks = HEIC2JPG::run_through_system_requirements();
+			$checks = RHEIC_HEIC2JPG::run_through_system_requirements();
 			$satisfied = $this->are_system_requirements_satisfied($checks);
 
 			?>
@@ -244,7 +244,7 @@ if(!class_exists('RHEIC_Plugin')) {
 		}
 
 		protected function can_work() {
-			$checks = HEIC2JPG::run_through_system_requirements();
+			$checks = RHEIC_HEIC2JPG::run_through_system_requirements();
 			return $this->are_system_requirements_satisfied($checks);
 		}
 		protected function are_system_requirements_satisfied($checks) {

@@ -1,5 +1,5 @@
 <?php
-class HEIC2JPG {
+class RHEIC_HEIC2JPG {
 
 	public static function save_image_for_browser($input_path, $output_path) {
 		$im = new Imagick();
@@ -28,7 +28,7 @@ class HEIC2JPG {
 		);
 
 		foreach($checks as &$check) {
-			$callable = array('HEIC2JPG', $check['func']);
+			$callable = array('RHEIC_HEIC2JPG', $check['func']);
 			$result = call_user_func($callable);
 			if(isset($result['error'])) {
 				$check['error'] = $result['error'];

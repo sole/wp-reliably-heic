@@ -58,7 +58,7 @@ class RHEIC_HEIC2JPG {
 			$im = new Imagick();
 			$v = Imagick::getVersion();
 			$test_image = 'test.heic';
-			$test_image_path = dirname(__FILE__) . '/assets/' . $test_image;
+			$test_image_path = dirname(__FILE__) . '/assets/internal/' . $test_image;
 	
 			try {
 				$im->readImage($test_image_path);

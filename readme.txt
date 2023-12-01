@@ -17,7 +17,7 @@ This plugin adds support for uploading HEIC images (which iPhones use) to WordPr
 
 If your server meets the requirements, it will attempt to convert images using your server's installation of ImageMagick and its corresponding php module.
 
-If your server does NOT meet the requirements, you can try tweaking your server's settings, or if that is not possible, you can try enablinthe experimental front-end processing as a fallback, and let your (modern) browser take care of converting images from HEIC to JPG before sending them to your server. This uses JavaScript and modern APIs like Canvas and WebAssembly, so you'll need a sufficiently up to date browser for this to work.
+If your server does NOT meet the requirements, you can try tweaking your server's settings, or if that is not possible, you can try enabling the experimental front-end processing as a fallback, and let your (modern) browser take care of converting images from HEIC to JPG before sending them to your server. This uses JavaScript and modern APIs like Canvas and WebAssembly, so you'll need a sufficiently up to date browser for this to work.
 
 To verify if the requirements are met and/or to enable the front-end image processing, visit the plugin's _settings_ page.
 
@@ -37,10 +37,13 @@ If you want to help, you can contribute to the plugin development here: https://
 
 == Changelog ==
 
-= 1.0 =
+= 1.1.0 =
+* First version in the plugins directory!
+
+= 1.0.0 =
 * First public version
 
 == Upgrade Notice ==
 
-= 1.0 =
+= 1.0.0 =
 * First public version

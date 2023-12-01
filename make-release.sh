@@ -40,5 +40,8 @@ if [ $# -eq 1 ]; then
 	echo "svn add trunk/*"
 	echo "# And with your WordPress.org login details (it'll ask for your password):"
 	echo "svn ci -m 'Your commit message' --username USERNAME"
+	echo ""
+	echo "svn cp trunk tags/(PLUGIN_VERSION)"
+	echo "svn ci -m 'Tagging version PLUGIN_VERSION'"
 	echo -e "\nGood luck! 💓\n"
 fi
